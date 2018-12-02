@@ -1,7 +1,7 @@
 isl([1,2,3,4,5,6,7,8]).
 isl2([any]).
 pow2(X,Y,Z):- Z is X**Y.
-
+%ncdmnmd
 pop([X|L],X,L).
 
 check_Adapter(X):-   isl(L),isl2(L2),not(member(X,L)),not(member(X,L2)),write('not correct adapter format').

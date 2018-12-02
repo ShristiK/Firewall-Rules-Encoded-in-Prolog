@@ -90,7 +90,7 @@ drop(X):-(
 
                (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,DestAddress,L3),pop(L3,PortNo,L4),pop(L4,PortNo1,L5),pop(L5,ProtoNo,L6), proto_drop(ProtoNo));
 
-               (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,DestAddress,L3),pop(L3,PortNo,L4),pop(L4,PortNo1,L5),pop(L5,ProtoNo,L6), pop(L6,vlanid,L7),ether_vlan_id_drop(vlanid))),write('packet is dropped(silently) due to ipv4.').
+             (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,DestAddress,L3),pop(L3,PortNo,L4),pop(L4,PortNo1,L5),pop(L5,ProtoNo,L6), pop(L6,vlanid,L7),ether_vlan_id_drop(vlanid))),write('packet is dropped(silently) due to ipv4.').
 
 
 
@@ -154,7 +154,7 @@ If ICMP is 0 message displayed is NO ICMP DECLARED along with reason for reject,
 reject(X):-(
                 (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,D,L3),pop(L3,Po,L4),pop(L4,P1,L5),pop(L5,P,L6),pop(L6,V,L7),pop(L7,It,L8),pop(L8,Ic,L9), icmp_reject(It,It,Ic));
 
-               (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,D,L3),pop(L3,Po,L4),pop(L4,P1,L5),pop(L5,P,L6),pop(L6,V,L7),pop(L7,It,L8),pop(L8,Ic,L9),ip_src_reject(SrcAddress,It,Ic));
+    (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,D,L3),pop(L3,Po,L4),pop(L4,P1,L5),pop(L5,P,L6),pop(L6,V,L7),pop(L7,It,L8),pop(L8,Ic,L9),ip_src_reject(SrcAddress,It,Ic));
 
                (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,DestAddress,L3),pop(L3,Po,L4),pop(L4,P1,L5),pop(L5,P,L6),pop(L6,V,L7),pop(L7,It,L8),pop(L8,Ic,L9),ip_dst_reject(DestAddress,It,Ic));
 
@@ -166,25 +166,27 @@ reject(X):-(
 
 
 
+/* 
 
+/*------------------------ALLOWED--------------Arguments----------------------------------*/
 
+/* If a packet is neither dropped nor rejected OR if any is given it is allowed*/
+/* for VLAN ID however only range/list is specicified to allow*/
 
-
+any_list([any]).              /* to allow any arguement*/
 ether_vlan_id_allowlist([423,55,21]).
 ether_vlan_id_allow_range(X):- (X>= 400, X=< 500).
-ether_vlan_id_allow(X):- (ether_vlan_id_allowlist(L),member(X,L));(ether_vlan_id_allow_range(X)).
 
+ether_vlan_id_allow(X):- (ether_vlan_id_allowlist(L),member(X,L));(ether_vlan_id_allow_range(X)). 
 
-
-proto_allow(X):-(any_list(R2),member(X,R2));(proto_allow_list(R1),member(X,R1)).
-
-ip_src_allow(X):-(any_list(Q),member(X,Q));(not(ip_src_drop(X)),not(ip_src_reject1(X))).
+proto_allow(X):-(any_list(R2),member(X,R2));(proto_allow_list(R1),member(X,R1)).  /* only TCP/UDP/ICMP allowed*/
+ 
+/*ALLOW ON BASIS OF IP ADDRESSES*/ 
+ip_src_allow(X):-(any_list(Q),member(X,Q));(not(ip_src_drop(X)),not(ip_src_reject1(X))). /
 ip_dst_allow(X):-(any_list(Q),member(X,Q));(not(ip_dst_drop(X)),not(ip_dst_reject1(X))).
 
-any_list([any]).
+/*ALLOW ON BASIS OF PORT NUMBERS*/ 
 src_port_allow(X):-(any_list(P),member(X,P));(not(src_port_drop(X)),not(src_port_reject1(X))).
-
-
 dest_port_allow(X):- (any_list(Q),member(X,Q));(not(dest_port_drop(X)),not(dest_port_reject1(X))).
 
 allow(X):-(
@@ -200,18 +202,17 @@ allow(X):-(
 
                (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,DestAddress,L3),pop(L3,PortNo,L4),pop(L4,PortNo1,L5),pop(L5,ProtoNo,L6), proto_allow(ProtoNo));
 
-               (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,DestAddress,L3),pop(L3,PortNo,L4),pop(L4,PortNo1,L5),pop(L5,ProtoNo,L6), pop(L6,vlanid,L7),ether_vlan_id_allow(vlanid))),write('packet is allowed due to ipv4.').
+             (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,DestAddress,L3),pop(L3,PortNo,L4),pop(L4,PortNo1,L5),pop(L5,ProtoNo,L6), pop(L6,vlanid,L7),ether_vlan_id_allow(vlanid))),write('packet is allowed due to ipv4.').
 
-
-/* If adapter of the packet is not in the list of allowed adapters the rules are not applied and the packet is allowed by default.*/
 
 adaptlist([1,2,any]).
+
 allow_due_to_adapter(X) :-  (pop(X,AdapterNo,L1),adaptlist(K),not(member(X,K))), write('allowed directly as adapter not doesnot match list of adapters').
 
+/* PACKET IS FIRST CHECKED FOR SYNTAX AND THEN ONLY ALLOWED TO CHECK FOR RULES. REJECTED HAS BEEN FIRST PRIORITY AND ALLOWED THE LAST*/
 packet(X):- (check(X), (allow_due_to_adapter(X); reject(X);drop(X);allow(X))).
-/*
-For checking ipv6 packet call the above predicates withh _ipv6. All rules of above are same. Only in check it checks the adress is in between 1 to 2**128 instead of 2**32 as was for ipv4.
-*/
+
+
 
 isl_ipv6([1,2,3,4,5,6,7,8]).
 isl2_ipv6([any]).
@@ -269,7 +270,7 @@ drop_ipv6(X):-(
 
                (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,DestAddress,L3),pop(L3,PortNo,L4),pop(L4,PortNo1,L5),pop(L5,ProtoNo,L6), proto_drop_ipv6(ProtoNo));
 
-               (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,DestAddress,L3),pop(L3,PortNo,L4),pop(L4,PortNo1,L5),pop(L5,ProtoNo,L6), pop(L6,vlanid,L7),ether_vlan_id_drop_ipv6(vlanid))),write('packet is dropped(silently) due to ipv4.').
+             (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,DestAddress,L3),pop(L3,PortNo,L4),pop(L4,PortNo1,L5),pop(L5,ProtoNo,L6), pop(L6,vlanid,L7),ether_vlan_id_drop_ipv6(vlanid))),write('packet is dropped(silently) due to ipv4.').
 
 
 

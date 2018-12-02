@@ -61,10 +61,10 @@ ether_vlan_id_drop_range(X):- (X>= 400, X=< 500).       /* range of  VLAN id */
 ether_vlan_id_drop(X):- (ether_vlan_id_droplist(L),member(X,L));(ether_vlan_id_drop_range(X)).
 
 /*checks if packet should be dropped on basis of source ip address,returns true if packet is dropped */
-ip_src_drop(X):-(src_ip_drop_list(L1),member(X,L1));range_ip_src_drop(X).
+src_ip_drop(X):-(src_ip_drop_list(L1),member(X,L1));range_ip_src_drop(X).
 
 /*checks if packet should be dropped on basis of destination ip address,returns true if packet is dropped */
-ip_dst_drop(X):-(dst_ip_drop_list(L2),member(X,L2));range_ip_dst_drop(X).
+dst_ip_drop(X):-(dst_ip_drop_list(L2),member(X,L2));range_ip_dst_drop(X).
 
 /*checks if packet should be dropped on basis of source port number,returns true if packet is dropped */
 src_port_drop(X) :- (src_port_droplist(L),member(X,L));src_port_drop_range(X).
@@ -80,9 +80,9 @@ proto_drop(X):-not((any_list(R2),member(X,R2));(proto_allow_list(R1),member(X,R1
 drop(X):-(
 
 
-               (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,D,L3),pop(L3,Po,L4),pop(L4,P1,L5),pop(L5,P,L6),pop(L6,V,L7),pop(L7,It,L8),pop(L8,Ic,L9),ip_src_drop(SrcAddress));
+               (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,D,L3),pop(L3,Po,L4),pop(L4,P1,L5),pop(L5,P,L6),pop(L6,V,L7),pop(L7,It,L8),pop(L8,Ic,L9),src_ip_drop(SrcAddress));
 
-               (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,DestAddress,L3),pop(L3,Po,L4),pop(L4,P1,L5),pop(L5,P,L6),pop(L6,V,L7),pop(L7,It,L8),pop(L8,Ic,L9),ip_dst_drop(DestAddress));
+               (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,DestAddress,L3),pop(L3,Po,L4),pop(L4,P1,L5),pop(L5,P,L6),pop(L6,V,L7),pop(L7,It,L8),pop(L8,Ic,L9),dst_ip_drop(DestAddress));
 
                (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,DestAddress,L3),pop(L3,PortNo,L4),pop(L4,P1,L5),pop(L5,P,L6),pop(L6,V,L7),pop(L7,It,L8),pop(L8,Ic,L9),src_port_drop(PortNo));
 
@@ -124,24 +124,24 @@ icmp_type_reject_list([1,312,5]).                         /*icmp type to be reje
 src_port_reject1(X) :- ((src_port_rejectlist(N),member(X,N));src_port_reject_range(X)),write('rejected due to source port due to ipv4').
 dest_port_reject1(X):-((dest_port_rejectlist(O),member(X,O));dest_port_reject_range(X)),write('rejected due to destination port due to ipv4').
 
-ip_src_reject1(X):-((src_ip_reject_list(P1),member(X,P1));range_ip_src_reject(X)),write('rejected due to source address due to ipv4').
-ip_dst_reject1(X):-((dst_ip_reject_list(P2),member(X,P2));range_ip_dst_reject(X)),write('rejected due to destination address due to ipv4').
+src_ip_reject1(X):-((src_ip_reject_list(P1),member(X,P1));range_ip_src_reject(X)),write('rejected due to source address due to ipv4').
+dst_ip_reject1(X):-((dst_ip_reject_list(P2),member(X,P2));range_ip_dst_reject(X)),write('rejected due to destination address due to ipv4').
 
 
 src_port_reject(X,Y,Z) :- ((src_port_rejectlist(N),member(X,N)); src_port_reject_range(X)),write('rejected due to source port due to ipv4'),((Y=:=0)->write('ICMP Type not declared');(write('ICMP Type:'),write( Y ),write(' ICMP Code:'), write(Z))).
 dest_port_reject(X,Y,Z):- ((dest_port_rejectlist(O),member(X,O));dest_port_reject_range(X)) ,write('rejected due to destination port considering ipv4'),((Y=:=0)->write('ICMP Type not declared');(write('ICMP Type:'),write(Y),write(' ICMP Code:'),write(Z))).
-ip_src_reject(X,Y,Z):-((src_ip_reject_list(P1),member(X,P1));range_ip_src_reject(X)),write('rejected due to source address considering ipv4 '),((Y=:=0)->write('ICMP Type not declared');(write('ICMP Type:'),write(Y),write( ' ICMP Code:'),write(Z))).
-ip_dst_reject(X,Y,Z):-((dst_ip_reject_list(P2),member(X,P2));range_ip_dst_reject(X)),write('rejected due to destination address considering ipv4'),((Y=:=0)->write('ICMP Type not declared');(write('ICMP Type:'),write(Y),write(' ICMP Code:'),write(Z))).
+src_ip_reject(X,Y,Z):-((src_ip_reject_list(P1),member(X,P1));range_ip_src_reject(X)),write('rejected due to source address considering ipv4 '),((Y=:=0)->write('ICMP Type not declared');(write('ICMP Type:'),write(Y),write( ' ICMP Code:'),write(Z))).
+dst_ip_reject(X,Y,Z):-((dst_ip_reject_list(P2),member(X,P2));range_ip_dst_reject(X)),write('rejected due to destination address considering ipv4'),((Y=:=0)->write('ICMP Type not declared');(write('ICMP Type:'),write(Y),write(' ICMP Code:'),write(Z))).
 
 icmp_reject(X,Y,Z):- (icmp_type_reject_list(L),member(X,L)),write('rejected due to icmp type considering ipv4'),((Y=:=0)->write('ICMP Type not declared');(write('ICMP Type:'),write(Y),write(' ICMP Code:'),write(Z))).
 
 
 reject(X):-(
-                (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,D,L3),pop(L3,Po,L4),pop(L4,P1,L5),pop(L5,P,L6),pop(L6,V,L7),pop(L7,It,L8),pop(L8,Ic,L9), icmp_reject(It,It,Ic));
+               (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,D,L3),pop(L3,Po,L4),pop(L4,P1,L5),pop(L5,P,L6),pop(L6,V,L7),pop(L7,It,L8),pop(L8,Ic,L9), icmp_reject(It,It,Ic));
 
-    (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,D,L3),pop(L3,Po,L4),pop(L4,P1,L5),pop(L5,P,L6),pop(L6,V,L7),pop(L7,It,L8),pop(L8,Ic,L9),ip_src_reject(SrcAddress,It,Ic));
+               (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,D,L3),pop(L3,Po,L4),pop(L4,P1,L5),pop(L5,P,L6),pop(L6,V,L7),pop(L7,It,L8),pop(L8,Ic,L9),src_ip_reject(SrcAddress,It,Ic));
 
-               (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,DestAddress,L3),pop(L3,Po,L4),pop(L4,P1,L5),pop(L5,P,L6),pop(L6,V,L7),pop(L7,It,L8),pop(L8,Ic,L9),ip_dst_reject(DestAddress,It,Ic));
+               (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,DestAddress,L3),pop(L3,Po,L4),pop(L4,P1,L5),pop(L5,P,L6),pop(L6,V,L7),pop(L7,It,L8),pop(L8,Ic,L9),dst_ip_reject(DestAddress,It,Ic));
 
                (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,DestAddress,L3),pop(L3,PortNo,L4),pop(L4,P1,L5),pop(L5,P,L6),pop(L6,V,L7),pop(L7,It,L8),pop(L8,Ic,L9),src_port_reject(PortNo,It,Ic));
 
@@ -163,8 +163,8 @@ ether_vlan_id_allow(X):- (ether_vlan_id_allowlist(L),member(X,L));(ether_vlan_id
 
 proto_allow(X):-(any_list(R2),member(X,R2));(proto_allow_list(R1),member(X,R1)).
 
-ip_src_allow(X):-(any_list(Q),member(X,Q));(not(ip_src_drop(X)),not(ip_src_reject1(X))).
-ip_dst_allow(X):-(any_list(Q),member(X,Q));(not(ip_dst_drop(X)),not(ip_dst_reject1(X))).
+src_ip_allow(X):-(any_list(Q),member(X,Q));(not(ip_src_drop(X)),not(src_ip_reject1(X))).
+dst_ip_allow(X):-(any_list(Q),member(X,Q));(not(ip_dst_drop(X)),not(dst_ip_reject1(X))).
 
 any_list([any]).
 src_port_allow(X):-(any_list(P),member(X,P));(not(src_port_drop(X)),not(src_port_reject1(X))).
@@ -175,9 +175,9 @@ dest_port_allow(X):- (any_list(Q),member(X,Q));(not(dest_port_drop(X)),not(dest_
 allow(X):-(
 
 
-               (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,D,L3),pop(L3,Po,L4),pop(L4,P1,L5),pop(L5,P,L6),pop(L6,V,L7),pop(L7,It,L8),pop(L8,Ic,L9),ip_src_allow(SrcAddress));
+               (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,D,L3),pop(L3,Po,L4),pop(L4,P1,L5),pop(L5,P,L6),pop(L6,V,L7),pop(L7,It,L8),pop(L8,Ic,L9),src_ip_allow(SrcAddress));
 
-               (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,DestAddress,L3),pop(L3,Po,L4),pop(L4,P1,L5),pop(L5,P,L6),pop(L6,V,L7),pop(L7,It,L8),pop(L8,Ic,L9),ip_dst_allow(DestAddress));
+               (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,DestAddress,L3),pop(L3,Po,L4),pop(L4,P1,L5),pop(L5,P,L6),pop(L6,V,L7),pop(L7,It,L8),pop(L8,Ic,L9),dst_ip_allow(DestAddress));
 
                (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,DestAddress,L3),pop(L3,PortNo,L4),pop(L4,P1,L5),pop(L5,P,L6),pop(L6,V,L7),pop(L7,It,L8),pop(L8,Ic,L9),src_port_allow(PortNo));
 
@@ -185,7 +185,7 @@ allow(X):-(
 
                (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,DestAddress,L3),pop(L3,PortNo,L4),pop(L4,PortNo1,L5),pop(L5,ProtoNo,L6), proto_allow(ProtoNo));
 
-             (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,DestAddress,L3),pop(L3,PortNo,L4),pop(L4,PortNo1,L5),pop(L5,ProtoNo,L6), pop(L6,vlanid,L7),ether_vlan_id_allow(vlanid))),write('packet is allowed due to ipv4.').
+               (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,DestAddress,L3),pop(L3,PortNo,L4),pop(L4,PortNo1,L5),pop(L5,ProtoNo,L6), pop(L6,vlanid,L7),ether_vlan_id_allow(vlanid))),write('packet is allowed due to ipv4.').
 
 
 adaptlist([1,2,any]).
@@ -290,7 +290,7 @@ icmp_reject_ipv6(X,Y,Z):- (icmp_type_reject_list_ipv6(L),member(X,L)),write('rej
 reject_ipv6(X):-(
                 (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,D,L3),pop(L3,Po,L4),pop(L4,P1,L5),pop(L5,P,L6),pop(L6,V,L7),pop(L7,It,L8),pop(L8,Ic,L9), icmp_reject_ipv6(It,It,Ic));
 
-    (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,D,L3),pop(L3,Po,L4),pop(L4,P1,L5),pop(L5,P,L6),pop(L6,V,L7),pop(L7,It,L8),pop(L8,Ic,L9),src_ip_reject_ipv6(SrcAddress,It,Ic));
+               (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,D,L3),pop(L3,Po,L4),pop(L4,P1,L5),pop(L5,P,L6),pop(L6,V,L7),pop(L7,It,L8),pop(L8,Ic,L9),src_ip_reject_ipv6(SrcAddress,It,Ic));
 
                (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,DestAddress,L3),pop(L3,Po,L4),pop(L4,P1,L5),pop(L5,P,L6),pop(L6,V,L7),pop(L7,It,L8),pop(L8,Ic,L9),dst_ip_reject_ipv6(DestAddress,It,Ic));
 

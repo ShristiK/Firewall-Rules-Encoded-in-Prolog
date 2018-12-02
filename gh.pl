@@ -190,7 +190,7 @@ allow(X):-(
 
 adaptlist([1,2,any]).
 
-allow_due_to_adapter(X) :-  (pop(X,AdapterNo,L1),adaptlist(K),not(member(X,K))), write('allowed directly as adapter not doesnot match list of adapters').
+allow_due_to_adapter(X) :-  (pop(X,AdapterNo,L1),adaptlist(K),not(member(AdapterNo,K))), write('allowed directly as adapter not doesnot match list of adapters').
 
 %alllloooowww
 packet(X):- (check(X), (allow_due_to_adapter(X); reject(X);drop(X);allow(X))).
@@ -336,7 +336,7 @@ allow_ipv6(X):-(
 
 adaptlist_ipv6([1,2,any]).
 
-allow_due_to_adapter_ipv6(X) :-  (pop(X,AdapterNo,L1),adaptlist_ipv6(K),not(member(X,K))), write('allowed directly as adapter not doesnot match list of adapters').
+allow_due_to_adapter_ipv6(X) :-  (pop(X,AdapterNo,L1),adaptlist_ipv6(K),not(member(AdapterNo,K))), write('allowed directly as adapter not doesnot match list of adapters').
 
 
 

@@ -41,21 +41,6 @@ proto_allow_list([1,6,17]).
 
 /* "port numbers / IP ADdresses/ether VLAN id" can lie in form of a list as well as in range. Both cases have been handled)*/
 
-src_port_droplist([12322,53241]).                      /* list of  source port numbers */
-dest_port_droplist([21,4,324,432]).                   /* list of destination port numbers */
-
-src_port_drop_range(X):- (X>=45),(X =<90).            /* range of  source port numbers */
-dest_port_drop_range(X) :- (X>= 22),(X=< 435).       /* range of destination port numbers */
-
-src_ip_drop_list([6,9,11,13]).                       /* list of  source ip address */
-dst_ip_drop_list([19,12,45,66]).                     /* list of  destination ip address */
-
-range_ip_src_drop(X):-(X>=56),(X=<78).                /* range of  source ip address */
-range_ip_dst_drop(X):-(X>=100),(X=<200).              /* range of destination ip address */
-
-ether_vlan_id_droplist([423,55,21]).                  /*list of VLAN id */
-ether_vlan_id_drop_range(X):- (X>= 400, X=< 500).       /* range of  VLAN id */
-
 
 /*checks if packet should be dropped on basis of VLAN ID ,returns true if packet is dropped*/
 ether_vlan_id_drop(X):- (ether_vlan_id_droplist(L),member(X,L));(ether_vlan_id_drop_range(X)).
@@ -105,20 +90,7 @@ drop(X):-(
 /*ether VLANid is just handled to drop the packet and not reject the packet as given in syntax*/ (point 6 in readme file)
 /* "port numbers / IP ADdresses/ether VLAN id" can lie in form of a list as well as in range. Both cases have been handled)*/
 
-src_port_rejectlist([331,56,86,231]).                      /* list of  source port numbers */
-dest_port_rejectlist([674,344,7867]).                      /* list of destination port numbers */
 
-src_ip_reject_list([1,4]).                                /* list of  source ip address */
-dst_ip_reject_list([129,212]).                            /* list of  destination ip address */
-
-src_port_reject_range(X):- (X>=21),(X=< 78).              /* range of  source port numbers */
-dest_port_reject_range(X) :- (X>= 22),(X=< 435).          /* range of destination port numbers */
-
-range_ip_src_reject(X):-(X>=158),(X=<178).                /* range of destination ip address */
-range_ip_dst_reject(X):-(X>=320),(X=<360).
-
-icmp_type_reject_list([1,312,5]).                         /*icmp type to be rejected*/
-%icmp_code_reject_list([1,3,2]).                          /*icmp code to be rejected*/
 
 /* this predicate is later used to check if packet should be allowed (not used here in reject)*/
 src_port_reject1(X) :- ((src_port_rejectlist(N),member(X,N));src_port_reject_range(X)),write('rejected due to source port due to ipv4').
@@ -173,9 +145,6 @@ reject(X):-(
 /* If a packet is neither dropped nor rejected OR if any is given it is allowed*/
 /* for VLAN ID however only range/list is specicified to allow*/
 
-any_list([any]).              /* to allow any arguement*/
-ether_vlan_id_allowlist([423,55,21]).
-ether_vlan_id_allow_range(X):- (X>= 400, X=< 500).
 
 ether_vlan_id_allow(X):- (ether_vlan_id_allowlist(L),member(X,L));(ether_vlan_id_allow_range(X)). 
 
@@ -205,9 +174,9 @@ allow(X):-(
              (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,DestAddress,L3),pop(L3,PortNo,L4),pop(L4,PortNo1,L5),pop(L5,ProtoNo,L6), pop(L6,vlanid,L7),ether_vlan_id_allow(vlanid))),write('packet is allowed due to ipv4.').
 
 
-adaptlist([1,2,any]).
 
-allow_due_to_adapter(X) :-  (pop(X,AdapterNo,L1),adaptlist(K),not(member(X,K))), write('allowed directly as adapter not doesnot match list of adapters').
+
+allow_due_to_adapter(X) :-  (pop(X,AdapterNo,L1),adaptlist(K),not(member(AdapterNo,K))), write('allowed directly as adapter not doesnot match list of adapters').
 
 /* PACKET IS FIRST CHECKED FOR SYNTAX AND THEN ONLY ALLOWED TO CHECK FOR RULES. REJECTED HAS BEEN FIRST PRIORITY AND ALLOWED THE LAST*/
 
@@ -216,8 +185,7 @@ packet(X):- (check(X), (allow_due_to_adapter(X); reject(X);drop(X);allow(X))).
 
 
 
-isl_ipv6([1,2,3,4,5,6,7,8]).
-isl2_ipv6([any]).
+
 
 check_Adapter_ipv6(X):-   isl_ipv6(L),isl2_ipv6(L2),not(member(X,L)),not(member(X,L2)),write('not correct adapter format').
 check_Src_ipv6(X):-       isl2_ipv6(L2),not(member(X,L2)),pow2(2,128,Z),not(between(1,Z,X)),write('not correct src address').
@@ -230,23 +198,13 @@ check_Icmp_Code_ipv6(X):- isl2_ipv6(L2),not(member(X,L2)),not(between(0,15,X)),w
 check_ipv6(List):-        pop(List,AdapterNo,L1),not(check_Adapter_ipv6(AdapterNo)),pop(L1,SrcAddress,L2),not(check_Src_ipv6(SrcAddress)),pop(L2,DestAddress,L3),not(check_Dest_ipv6(DestAddress)),pop(L3,PortNo,L4),not(check_Port_ipv6(PortNo)),pop(L4,PortNo1,L5),not(check_Port_ipv6(PortNo1)),pop(L5,ProtoNo,L6),not(check_Proto_ipv6(ProtoNo)),pop(L6,VlanId,L7),not(check_Vlan_ipv6(VlanId)),pop(L7,IcmpType,L8),not(check_Icmp_Type_ipv6(IcmpType)),pop(L8,IcmpCode,L9),not(check_Icmp_Code_ipv6(IcmpCode)).
 
 
-src_port_droplist_ipv6([12322,53241]).
-src_port_drop_range_ipv6(X):- (X>=45),(X =<90).
+
 % Block if port is in range or src address or destination address in range.
 
-dest_port_droplist_ipv6([21,4,324,432]).
-dest_port_drop_range_ipv6(X) :- (X>= 22),(X=< 435).
 
-src_ip_drop_list_ipv6([6,9,11,13]).
-dst_ip_drop_list_ipv6([19,12,45,66]).
-range_src_ip_drop_ipv6(X):-(X>=56),(X=<78).
-range_dst_ip_drop_ipv6(X):-(X>=100),(X=<200).
-
-ether_vlan_id_droplist_ipv6([423,55,21]).
-ether_vlan_id_drop_range_ipv6(X):- (X>= 400, X=< 500).
 ether_vlan_id_drop_ipv6(X):- (ether_vlan_id_droplist_ipv6(L),member(X,L));(ether_vlan_id_drop_range_ipv6(X)).
 
-proto_allow_list_ipv6([1,6,17]).
+
 
 
 src_ip_drop_ipv6(X):-(src_ip_drop_list_ipv6(L1),member(X,L1));range_src_ip_drop_ipv6(X).
@@ -277,18 +235,7 @@ drop_ipv6(X):-(
 
 
 
-src_port_rejectlist_ipv6([331,56,86,231]).
-dest_port_rejectlist_ipv6([674,344,7867]).
 
-src_ip_reject_list_ipv6([1,4]).
-dst_ip_reject_list_ipv6([129,212]).
-
-src_port_reject_range_ipv6(X):- (X>=21),(X=< 78).
-dest_port_reject_range_ipv6(X) :- (X>= 22),(X=< 435).
-range_src_ip_reject_ipv6(X):-(X>=158),(X=<178).
-range_dst_ip_reject_ipv6(X):-(X>=320),(X=<360).
-icmp_type_reject_list_ipv6([1,312,5]).
-%icmp_code_reject_list([1,3,2]).
 
 src_port_reject1_ipv6(X) :- ((src_port_rejectlist_ipv6(N),member(X,N));src_port_reject_range_ipv6(X)),write('rejected due to source port due to ipv6').
 dest_port_reject1_ipv6(X):-((dest_port_rejectlist_ipv6(O),member(X,O));dest_port_reject_range_ipv6(X)),write('rejected due to destination port due to ipv6').
@@ -319,8 +266,7 @@ reject_ipv6(X):-(
            ).
 
 
-ether_vlan_id_allowlist_ipv6([423,55,21]).
-ether_vlan_id_allow_range_ipv6(X):- (X>= 400, X=< 500).
+
 ether_vlan_id_allow_ipv6(X):- (ether_vlan_id_allowlist_ipv6(L),member(X,L));(ether_vlan_id_allow_range_ipv6(X)).
 
 
@@ -331,7 +277,7 @@ proto_allow_ipv6(X):-(any_list(R2),member(X,R2));(proto_allow_list_ipv6(R1),memb
 src_ip_allow_ipv6(X):-(any_list(Q),member(X,Q));(not(src_ip_drop_ipv6(X)),not(src_ip_reject1_ipv6(X))).
 dst_ip_allow_ipv6(X):-(any_list(Q),member(X,Q));(not(dst_ip_drop_ipv6(X)),not(dst_ip_reject1_ipv6(X))).
 
-any_list_ipv6([any]).
+
 src_port_allow_ipv6(X):-(any_list_ipv6(P),member(X,P));(not(src_port_drop_ipv6(X)),not(src_port_reject1_ipv6(X))).
 
 
@@ -353,9 +299,9 @@ allow_ipv6(X):-(
                (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,DestAddress,L3),pop(L3,PortNo,L4),pop(L4,PortNo1,L5),pop(L5,ProtoNo,L6), pop(L6,vlanid,L7),ether_vlan_id_allow_ipv6(vlanid))),write('packet is allowed due to ipv6.').
 
 
-adaptlist_ipv6([1,2,any]).
 
-allow_due_to_adapter_ipv6(X) :-  (pop(X,AdapterNo,L1),adaptlist_ipv6(K),not(member(X,K))), write('allowed directly as adapter not doesnot match list of adapters').
+
+allow_due_to_adapter_ipv6(X) :-  (pop(X,AdapterNo,L1),adaptlist_ipv6(K),not(member(AdapterNo,K))), write('allowed directly as adapter not doesnot match list of adapters').
 
 
 /* START OF CODE FOR IPV6*/

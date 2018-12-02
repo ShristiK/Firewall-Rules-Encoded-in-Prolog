@@ -57,18 +57,26 @@ ether_vlan_id_droplist([423,55,21]).                  /*list of VLAN id */
 ether_vlan_id_drop_range(X):- (X>= 400, X=< 500).       /* range of  VLAN id */
 
 
+/*checks if packet should be dropped on basis of VLAN ID ,returns true if packet is dropped*/
 ether_vlan_id_drop(X):- (ether_vlan_id_droplist(L),member(X,L));(ether_vlan_id_drop_range(X)).
 
+/*checks if packet should be dropped on basis of source ip address,returns true if packet is dropped */
 ip_src_drop(X):-(src_ip_drop_list(L1),member(X,L1));range_ip_src_drop(X).
 
+/*checks if packet should be dropped on basis of destination ip address,returns true if packet is dropped */
 ip_dst_drop(X):-(dst_ip_drop_list(L2),member(X,L2));range_ip_dst_drop(X).
 
+/*checks if packet should be dropped on basis of source port number,returns true if packet is dropped */
 src_port_drop(X) :- (src_port_droplist(L),member(X,L));src_port_drop_range(X).
 
+/*checks if packet should be dropped on basis of destination ip address,returns true if packet is dropped */
 dest_port_drop(X):- (dest_port_droplist(M),member(X,M));dest_port_drop_range(X).
 
-proto_drop(X):-not((any_list(R2),member(X,R2));(proto_allow_list(R1),member(X,R1))).
+/* protocol id if not TCP/UDP/ICMP, packet is dropped silently */
+proto_drop(X):-not((any_list(R2),member(X,R2));(proto_allow_list(R1),member(X,R1))). 
 
+
+/* A packet is dropped (silently) if any of the arguments satisfies the drop conditions. OR has been used to ensure this. If anyone is true drop(X) returns true i.e. packet is dropped*/
 drop(X):-(
 
 
@@ -84,18 +92,34 @@ drop(X):-(
 
              (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,DestAddress,L3),pop(L3,PortNo,L4),pop(L4,PortNo1,L5),pop(L5,ProtoNo,L6), pop(L6,vlanid,L7),ether_vlan_id_drop(vlanid))),write('packet is dropped(silently) due to ipv4.').
 
-src_port_rejectlist([331,56,86,231]).
-dest_port_rejectlist([674,344,7867]).
 
-src_ip_reject_list([1,4]).
-dst_ip_reject_list([129,212]).
 
-src_port_reject_range(X):- (X>=21),(X=< 78).
-dest_port_reject_range(X) :- (X>= 22),(X=< 435).
-range_ip_src_reject(X):-(X>=158),(X=<178).
+
+/*-----------REJECT arguments----------------*/
+
+
+
+/* manually created lists to specify when to reject the packet. Values can be added or deleted but keep the list [] even if you don't want any arguements)*/
+/* assumed if protocol not TCP,UDP,ICMP it is dropped so we have not handled reject for protocol*/
+/*only rejected on basis of ICMP, so ICMP case only handled for Reject and not dropped*/
+/*ether VLANid is just handled to drop the packet and not reject the packet as given in syntax*/ (point 6 in readme file)
+/* "port numbers / IP ADdresses/ether VLAN id" can lie in form of a list as well as in range. Both cases have been handled)*/
+
+src_port_rejectlist([331,56,86,231]).                      /* list of  source port numbers */
+dest_port_rejectlist([674,344,7867]).                      /* list of destination port numbers */
+
+src_ip_reject_list([1,4]).                                /* list of  source ip address */
+dst_ip_reject_list([129,212]).                            /* list of  destination ip address */
+
+src_port_reject_range(X):- (X>=21),(X=< 78).              /* range of  source port numbers */
+dest_port_reject_range(X) :- (X>= 22),(X=< 435).          /* range of destination port numbers */
+
+range_ip_src_reject(X):-(X>=158),(X=<178).                /* range of destination ip address */
 range_ip_dst_reject(X):-(X>=320),(X=<360).
-icmp_type_reject_list([1,312,5]).
-%icmp_code_reject_list([1,3,2]).
+
+icmp_type_reject_list([1,312,5]).                         /*icmp type to be rejected*/
+%icmp_code_reject_list([1,3,2]).                          /*icmp code to be rejected*/
+
 
 src_port_reject1(X) :- ((src_port_rejectlist(N),member(X,N));src_port_reject_range(X)),write('rejected due to source port due to ipv4').
 dest_port_reject1(X):-((dest_port_rejectlist(O),member(X,O));dest_port_reject_range(X)),write('rejected due to destination port due to ipv4').

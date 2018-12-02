@@ -4,19 +4,25 @@ then an error message is sent stating the reason of where the first occurence of
 
 /*list of adapter id possible*/
 isl([1,2,3,4,5,6,7,8]).
+
 /*any keyword is acceptable for all arguments if we want packet to be allowed irrespective of that arguement*/
 isl2([any]).
+
 /*pow function is used to specify IP Address*/
 pow2(X,Y,Z):- Z is X**Y.
 
-
+/*pop is used to get arguments from the packet list*/
 pop([X|L],X,L).
 
-check_Adapter(X):-   isl(L),isl2(L2),not(member(X,L)),not(member(X,L2)),write('not correct adapter format').
-check_Src(X):-       isl2(L2),not(member(X,L2)),pow2(2,32,Z),not(between(1,Z,X)),write('not correct src address').
-check_Dest(X):-      isl2(L2),not(member(X,L2)),pow2(2,32,Z),not(between(1,Z,X)),write('not correct dest address').
-check_Port(X):-      isl2(L2),not(member(X,L2)),not(between(0,65535,X)),write('not correct port no').
-check_Proto(X):-     isl2(L2),not(member(X,L2)),not(between(1,255,X)),write('not correct protocol no').
+/* in built predicate between is used to check the range*/
+
+check_Adapter(X):-   isl(L),isl2(L2),not(member(X,L)),not(member(X,L2)),write('not correct adapter format').  /*to check adapter id*/
+check_Src(X):-       isl2(L2),not(member(X,L2)),pow2(2,32,Z),not(between(1,Z,X)),write('not correct src address').  /*to check source ip address*/
+check_Dest(X):-      isl2(L2),not(member(X,L2)),pow2(2,32,Z),not(between(1,Z,X)),write('not correct dest address').  /*to check destination ip address*/
+check_Port(X):-      isl2(L2),not(member(X,L2)),not(between(0,65535,X)),write('not correct port no'). 
+check_Proto(X):-     isl2(L2),not(member(X,L2)),not(between(1,255,X)),write('not correct protocol no'). 
+check_Proto(X):-     isl2(L2),not(member(X,L2)),not(between(1,255,X)),write('not correct protocol no'). 
+check_Proto(X):-     isl2(L2),not(member(X,L2)),not(between(1,255,X)),write('not correct protocol no'). 
 check_Vlan(X):-      isl2(L2),not(member(X,L2)),not(between(1,4094,X)),write('not correct vlan id').
 check_Icmp_Type(X):- isl2(L2),not(member(X,L2)),not(between(0,254,X)),write('not correct icmp type').
 check_Icmp_Code(X):- isl2(L2),not(member(X,L2)),not(between(0,15,X)),write('not correct icmp code').

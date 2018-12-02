@@ -1,0 +1,28 @@
+   TEST CASES
+
+1. Input- packet([1,4,432,6,6,6,7,0,0)
+    Output- rejected due to source address considering ipv4. ICMP type not declared.
+
+Explanation: since 4 lies in list of rejected source ip addresses the packet is rejected. IPV4 rules are used since  packet() predicate is used. 
+ICMP code is given 0 so icmp not declared comes.
+
+
+2. Input- packet_ipv6([1,4,432,6,6,6,7,0,0)
+    Output- rejected due to source address considering ipv4. ICMP type not declared.
+
+Explanation: since 4 lies in list of rejected source ip addresses the packet is rejected. IPV6 rules are used since  packet_ipv6() predicate is used. 
+ICMP code is given 0 so icmp not declared comes.
+
+
+3. Input- packet_ipv6([1,3,432,6,6,6,7,0,0)
+    Output- allowed due to source address considering ipv6. ICMP type not declared.
+
+Explanation: since 4 doesnt lie in list of rejected as well as drop source ip addresses the packet is rejected. IPV6 rules are used since  packet() predicate is used. 
+ICMP code is given 0 so icmp not declared comes.
+
+
+4. Input- packet([1,4,432,6,6,6,7,1,1)
+    Output- rejected due to icmp type considering ipv4. ICMP Type:1 ICMP Code:1
+
+Explanation: since 4 lies in list of rejected source ip addresses the packet is rejected. IPV4 rules are used since  packet() predicate is used. 
+ICMP code is given 1 so icmp code comes.

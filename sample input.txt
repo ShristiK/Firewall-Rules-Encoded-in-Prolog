@@ -1,0 +1,15 @@
+			       SAMPLE INPUT
+
+1. Input is assumed to be given as a specific format as follows:
+  
+-->a list of form
+	['adapter id', 'ip source address', 'ip destination address', 'source port number', 'destination port number', 'protocol id' 'VLan id', 'ICMP code','ICMP type']
+---> each argument is in decimal.
+----> In case we want to allow packet for any value of a particular parameter, give 'any' keyword.
+       For e.g  if we want to allow packet from any source port, change the source port number to 'any'.
+----> for ICMP code, if packet does not have icmp protocol then put ICMP Code as 0 and ICMP type as 0. If it does, ICMP code and type are given accordingly.
+-----> TO CHECK FOR IPV6 USE COMMAND PACKET_IPV6() AND FOR IPV4 USE PACKET()
+
+
+
+

@@ -210,6 +210,8 @@ adaptlist([1,2,any]).
 allow_due_to_adapter(X) :-  (pop(X,AdapterNo,L1),adaptlist(K),not(member(X,K))), write('allowed directly as adapter not doesnot match list of adapters').
 
 /* PACKET IS FIRST CHECKED FOR SYNTAX AND THEN ONLY ALLOWED TO CHECK FOR RULES. REJECTED HAS BEEN FIRST PRIORITY AND ALLOWED THE LAST*/
+
+/* START OF CODE FOR IPV4*/
 packet(X):- (check(X), (allow_due_to_adapter(X); reject(X);drop(X);allow(X))).
 
 
@@ -356,7 +358,7 @@ adaptlist_ipv6([1,2,any]).
 allow_due_to_adapter_ipv6(X) :-  (pop(X,AdapterNo,L1),adaptlist_ipv6(K),not(member(X,K))), write('allowed directly as adapter not doesnot match list of adapters').
 
 
-
+/* START OF CODE FOR IPV6*/
 
 packet_ipv6(X):- (check_ipv6(X), (allow_due_to_adapter_ipv6(X); reject_ipv6(X);drop_ipv6(X);allow_ipv6(X))).
 

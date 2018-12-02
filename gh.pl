@@ -203,14 +203,15 @@ allow(X):-(
                (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,DestAddress,L3),pop(L3,PortNo,L4),pop(L4,PortNo1,L5),pop(L5,ProtoNo,L6), pop(L6,vlanid,L7),ether_vlan_id_allow(vlanid))),write('packet is allowed due to ipv4.').
 
 
-adaptlist([1,2,any]).
+/* If adapter of the packet is not in the list of allowed adapters the rules are not applied and the packet is allowed by default.*/
 
+adaptlist([1,2,any]).
 allow_due_to_adapter(X) :-  (pop(X,AdapterNo,L1),adaptlist(K),not(member(X,K))), write('allowed directly as adapter not doesnot match list of adapters').
 
-%alllloooowww
 packet(X):- (check(X), (allow_due_to_adapter(X); reject(X);drop(X);allow(X))).
-%packet consition
-%
+/*
+For checking ipv6 packet call the above predicates withh _ipv6. All rules of above are same. Only in check it checks the adress is in between 1 to 2**128 instead of 2**32 as was for ipv4.
+*/
 
 isl_ipv6([1,2,3,4,5,6,7,8]).
 isl2_ipv6([any]).

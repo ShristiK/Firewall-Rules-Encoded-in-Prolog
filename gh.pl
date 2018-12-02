@@ -3,10 +3,10 @@
 then an error message is sent stating the reason of where the first occurence of error is encountered and the no rules are checked*/
 
 /*list of adapter id possible*/
-isl([1,2,3,4,5,6,7,8]).
+
 
 /*any keyword is acceptable for all arguments if we want packet to be allowed irrespective of that arguement*/
-isl2([any]).
+
 
 /*pow function is used to specify IP Address*/
 pow2(X,Y,Z):- Z is X**Y.
@@ -33,7 +33,7 @@ check(List):-        pop(List,AdapterNo,L1),not(check_Adapter(AdapterNo)),pop(L1
 
 
 
-proto_allow_list([1,6,17]).
+
 
 /*-----------DROP arguments----------------*/
 

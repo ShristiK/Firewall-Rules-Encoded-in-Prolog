@@ -272,7 +272,7 @@ drop_ipv6(X):-(
 
                (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,DestAddress,L3),pop(L3,PortNo,L4),pop(L4,PortNo1,L5),pop(L5,ProtoNo,L6), proto_drop_ipv6(ProtoNo));
 
-             (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,DestAddress,L3),pop(L3,PortNo,L4),pop(L4,PortNo1,L5),pop(L5,ProtoNo,L6), pop(L6,vlanid,L7),ether_vlan_id_drop_ipv6(vlanid))),write('packet is dropped(silently) due to ipv4.').
+             (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,DestAddress,L3),pop(L3,PortNo,L4),pop(L4,PortNo1,L5),pop(L5,ProtoNo,L6), pop(L6,vlanid,L7),ether_vlan_id_drop_ipv6(vlanid))),write('packet is dropped(silently) due to ipv6.').
 
 
 
@@ -299,8 +299,8 @@ dst_ip_reject1_ipv6(X):-((dst_ip_reject_list_ipv6(P2),member(X,P2));range_dst_ip
 
 src_port_reject_ipv6(X,Y,Z) :- ((src_port_rejectlist_ipv6(N),member(X,N)); src_port_reject_range_ipv6(X)),write('rejected due to source port due to ipv6'),((Y=:=0)->write('ICMP Type not declared');(write('ICMP Type:'),write( Y ),write(' ICMP Code:'), write(Z))).
 dest_port_reject_ipv6(X,Y,Z):- ((dest_port_rejectlist_ipv6(O),member(X,O));dest_port_reject_range_ipv6(X)) ,write('rejected due to destination port considering ipv4'),((Y=:=0)->write('ICMP Type not declared');(write('ICMP Type:'),write(Y),write(' ICMP Code:'),write(Z))).
-src_ip_reject_ipv6(X,Y,Z):-((src_ip_reject_list_ipv6(P1),member(X,P1));range_src_ip_reject_ipv6(X)),write('rejected due to source address considering ipv4 '),((Y=:=0)->write('ICMP Type not declared');(write('ICMP Type:'),write(Y),write( ' ICMP Code:'),write(Z))).
-dst_ip_reject_ipv6(X,Y,Z):-((dst_ip_reject_list_ipv6(P2),member(X,P2));range_dst_ip_reject_ipv6(X)),write('rejected due to destination address considering ipv4'),((Y=:=0)->write('ICMP Type not declared');(write('ICMP Type:'),write(Y),write(' ICMP Code:'),write(Z))).
+src_ip_reject_ipv6(X,Y,Z):-((src_ip_reject_list_ipv6(P1),member(X,P1));range_src_ip_reject_ipv6(X)),write('rejected due to source address considering ipv6 '),((Y=:=0)->write('ICMP Type not declared');(write('ICMP Type:'),write(Y),write( ' ICMP Code:'),write(Z))).
+dst_ip_reject_ipv6(X,Y,Z):-((dst_ip_reject_list_ipv6(P2),member(X,P2));range_dst_ip_reject_ipv6(X)),write('rejected due to destination address considering ipv6'),((Y=:=0)->write('ICMP Type not declared');(write('ICMP Type:'),write(Y),write(' ICMP Code:'),write(Z))).
 
 icmp_reject_ipv6(X,Y,Z):- (icmp_type_reject_list_ipv6(L),member(X,L)),write('rejected due to icmp type considering ipv4'),((Y=:=0)->write('ICMP Type not declared');(write('ICMP Type:'),write(Y),write(' ICMP Code:'),write(Z))).
 
@@ -350,7 +350,7 @@ allow_ipv6(X):-(
 
                (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,DestAddress,L3),pop(L3,PortNo,L4),pop(L4,PortNo1,L5),pop(L5,ProtoNo,L6), proto_allow_ipv6(ProtoNo));
 
-               (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,DestAddress,L3),pop(L3,PortNo,L4),pop(L4,PortNo1,L5),pop(L5,ProtoNo,L6), pop(L6,vlanid,L7),ether_vlan_id_allow_ipv6(vlanid))),write('packet is allowed due to ipv4.').
+               (pop(X,AdapterNo,L1),pop(L1,SrcAddress,L2),pop(L2,DestAddress,L3),pop(L3,PortNo,L4),pop(L4,PortNo1,L5),pop(L5,ProtoNo,L6), pop(L6,vlanid,L7),ether_vlan_id_allow_ipv6(vlanid))),write('packet is allowed due to ipv6.').
 
 
 adaptlist_ipv6([1,2,any]).

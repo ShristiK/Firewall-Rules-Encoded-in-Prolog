@@ -32,26 +32,32 @@ check(List):-        pop(List,AdapterNo,L1),not(check_Adapter(AdapterNo)),pop(L1
 
 
 
+
 proto_allow_list([1,6,17]).
 
+/*-----------DROP arguments----------------*/
 
-src_port_droplist([12322,53241]).
-src_port_drop_range(X):- (X>=45),(X =<90).
-% Block if port is in range or src address or destination address in range.
+/* manually created lists to specify when to drop the packet. Values can be added or deleted but keep the list [] if don't want any arguements)*/
 
-dest_port_droplist([21,4,324,432]).
-dest_port_drop_range(X) :- (X>= 22),(X=< 435).
+/* "port numbers / IP ADdresses/ether VLAN id" can lie in form of a list as well as in range. Both cases have been handled)*/
 
-src_ip_drop_list([6,9,11,13]).
-dst_ip_drop_list([19,12,45,66]).
-range_ip_src_drop(X):-(X>=56),(X=<78).
-range_ip_dst_drop(X):-(X>=100),(X=<200).
+src_port_droplist([12322,53241]).                      /* list of  source port numbers */
+dest_port_droplist([21,4,324,432]).                   /* list of destination port numbers */
 
-ether_vlan_id_droplist([423,55,21]).
-ether_vlan_id_drop_range(X):- (X>= 400, X=< 500).
+src_port_drop_range(X):- (X>=45),(X =<90).            /* range of  source port numbers */
+dest_port_drop_range(X) :- (X>= 22),(X=< 435).       /* range of destination port numbers */
+
+src_ip_drop_list([6,9,11,13]).                       /* list of  source ip address */
+dst_ip_drop_list([19,12,45,66]).                     /* list of  destination ip address */
+
+range_ip_src_drop(X):-(X>=56),(X=<78).                /* range of  source ip address */
+range_ip_dst_drop(X):-(X>=100),(X=<200).              /* range of destination ip address */
+
+ether_vlan_id_droplist([423,55,21]).                  /*list of VLAN id */
+ether_vlan_id_drop_range(X):- (X>= 400, X=< 500).       /* range of  VLAN id */
+
+
 ether_vlan_id_drop(X):- (ether_vlan_id_droplist(L),member(X,L));(ether_vlan_id_drop_range(X)).
-
-
 
 ip_src_drop(X):-(src_ip_drop_list(L1),member(X,L1));range_ip_src_drop(X).
 

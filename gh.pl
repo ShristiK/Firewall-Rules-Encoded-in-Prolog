@@ -16,19 +16,19 @@ pop([X|L],X,L).
 
 /* in built predicate between is used to check the range*/
 
-check_Adapter(X):-   isl(L),isl2(L2),not(member(X,L)),not(member(X,L2)),write('not correct adapter format').  /*to check adapter id*/
-check_Src(X):-       isl2(L2),not(member(X,L2)),pow2(2,32,Z),not(between(1,Z,X)),write('not correct src address').  /*to check source ip address*/
-check_Dest(X):-      isl2(L2),not(member(X,L2)),pow2(2,32,Z),not(between(1,Z,X)),write('not correct dest address').  /*to check destination ip address*/
-check_Port(X):-      isl2(L2),not(member(X,L2)),not(between(0,65535,X)),write('not correct port no'). 
-check_Proto(X):-     isl2(L2),not(member(X,L2)),not(between(1,255,X)),write('not correct protocol no'). 
-check_Proto(X):-     isl2(L2),not(member(X,L2)),not(between(1,255,X)),write('not correct protocol no'). 
-check_Proto(X):-     isl2(L2),not(member(X,L2)),not(between(1,255,X)),write('not correct protocol no'). 
-check_Vlan(X):-      isl2(L2),not(member(X,L2)),not(between(1,4094,X)),write('not correct vlan id').
-check_Icmp_Type(X):- isl2(L2),not(member(X,L2)),not(between(0,254,X)),write('not correct icmp type').
-check_Icmp_Code(X):- isl2(L2),not(member(X,L2)),not(between(0,15,X)),write('not correct icmp code').
+check_Adapter(X):-   isl(L),isl2(L2),not(member(X,L)),not(member(X,L2)),write('not correct adapter format').  /*to check adapter id syntax,gives true for wrong syntax*/
+check_Src(X):-       isl2(L2),not(member(X,L2)),pow2(2,32,Z),not(between(1,Z,X)),write('not correct src address').  /*to check source ip address syntax,gives true for wrong syntax */
+check_Dest(X):-      isl2(L2),not(member(X,L2)),pow2(2,32,Z),not(between(1,Z,X)),write('not correct dest address').  /*to check destination ip address syntax,gives true for wrong syntax*/
+check_Port(X):-      isl2(L2),not(member(X,L2)),not(between(0,65535,X)),write('not correct port no'). /*to check port number syntax,gives true for wrong syntax*/
+check_Proto(X):-     isl2(L2),not(member(X,L2)),not(between(1,255,X)),write('not correct protocol no'). /*to check prtocol number syntax,gives true for wrong syntax*/
+check_Vlan(X):-      isl2(L2),not(member(X,L2)),not(between(1,4094,X)),write('not correct vlan id'). /*to check VLan ID syntax,gives true for wrong syntax*/
+check_Icmp_Type(X):- isl2(L2),not(member(X,L2)),not(between(0,254,X)),write('not correct icmp type'). /*to check icmp code syntax. If not mentioned,give 0,gives true for wrong syntax*/
+check_Icmp_Code(X):- isl2(L2),not(member(X,L2)),not(between(0,15,X)),write('not correct icmp code'). /*to check icmp type syntax. If not mentioned,give 0,gives true for wrong syntax*/
+
+/*if any of the syntax is false check(List) will return false. takes packet as argument*/
 check(List):-        pop(List,AdapterNo,L1),not(check_Adapter(AdapterNo)),pop(L1,SrcAddress,L2),not(check_Src(SrcAddress)),pop(L2,DestAddress,L3),not(check_Dest(DestAddress)),pop(L3,PortNo,L4),not(check_Port(PortNo)),pop(L4,PortNo1,L5),not(check_Port(PortNo1)),pop(L5,ProtoNo,L6),not(check_Proto(ProtoNo)),pop(L6,VlanId,L7),not(check_Vlan(VlanId)),pop(L7,IcmpType,L8),not(check_Icmp_Type(IcmpType)),pop(L8,IcmpCode,L9),not(check_Icmp_Code(IcmpCode)).
 
-%Code
+
 
 
 

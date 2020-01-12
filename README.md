@@ -30,8 +30,6 @@ SWI-Prolog is a freely downloadable software available at https://www.swi-prolog
    b. Drop : "Packet is Dropped" without giving any reason as dropped silently.
     
    c. Rejected: "Packet is rejected" along with the reason.
-    
-----> After message is displayed press enter to terminate the code.
 
 2. Within Reject/Allow/Deny, it has been assumed that packet is rejected/allowed/dropped even when one condition matches.
 	i.e. If Source IP Address meets the reject condition, packet is dropped irrespective of other arguments of packet.
@@ -69,7 +67,7 @@ SWI-Prolog is a freely downloadable software available at https://www.swi-prolog
 
 9. If packet has both TCP/UDP and ICMP just declare TCP/UDP protocol number and give ICMP code and type not equal to 0.
 
-10. Adapter ID has been mapped from A- H to 1- 8.
+10. Adapter ID has been mapped from A-H to 1-8.
 
 11. IP Address are mapped to decimal numbers 1 to 2^32 for ipV4 and 1 to 2^128 for ipV6.
 
